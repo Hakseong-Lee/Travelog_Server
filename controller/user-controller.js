@@ -1,5 +1,5 @@
-import { userService } from '../services/index.js';
-import is from '@sindresorhus/is';
+import { userService } from '../services/index.js'
+import is from '@sindresorhus/is'
 
 const addUser = async (req, res, next) => {
   try {
@@ -8,9 +8,9 @@ const addUser = async (req, res, next) => {
     if (is.emptyObject(req.body)) {
       return res.status(400).send({
         error: 'headers의 Content-Type을 application/json으로 설정해주세요',
-      });
+      })
     }
-    const { email, password, name, nickname, address, role, age } = req.body;
+    const { email, password, name, nickname, address, role, age } = req.body
 
     const userInfo = {
       email,
@@ -21,92 +21,92 @@ const addUser = async (req, res, next) => {
       role,
       // ...(role || { role: 'user' }),
       age,
-    };
-    await userService.addUser(res, userInfo);
+    }
+    await userService.addUser(res, userInfo)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 const userLogin = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body
 
-    const token = await userService.getUserToken(res, email, password);
+    const token = await userService.getUserToken(res, email, password)
 
     // 로그인 진행 성공시 userId(문자열) 와 jwt 토큰(문자열)을 프론트에 보냄
     // res.status(200).json({ userId, token });
-    res.status(200).json({ token });
+    res.status(200).json({ token })
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
-};
+}
 
 const userPasswordCheck = async (req, res, next) => {
   try {
-    const { password } = req.body;
-    const users = await userService.getUser(req.user.id);
+    const { password } = req.body
+    const users = await userService.getUser(req.user.id)
 
-    const isPassword = await userService.checkPassword(password, users);
+    const isPassword = await userService.checkPassword(password, users)
 
     // 로그인 진행 성공시 userId(문자열) 와 jwt 토큰(문자열)을 프론트에 보냄
     // res.status(200).json({ userId, token });
-    res.status(200).json({ isPassword });
+    res.status(200).json({ isPassword })
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
-};
+}
 
 const socialLoginToken = async (req, res, next) => {
   try {
-    const token = await userService.getSocialUserToken(req.user.email);
-    res.status(201).json({ token });
+    const token = await userService.getSocialUserToken(req.user.email)
+    res.status(201).json({ token })
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
-};
+}
 
 const getUsers = async (req, res, next) => {
   try {
-    const users = await userService.getUsers();
+    const users = await userService.getUsers()
 
     // 사용자 목록(배열)을 JSON 형태로 프론트에 보냄
-    res.status(200).json(users);
+    res.status(200).json(users)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 const getUser = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-    const users = await userService.getUser(userId);
+    const userId = req.user.id
+    const users = await userService.getUser(userId)
 
     // 사용자 목록(배열)을 JSON 형태로 프론트에 보냄
-    res.status(200).json(users);
+    res.status(200).json(users)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 const delUserById = async (req, res, next) => {
   try {
-    const userId = Number(req.params.userId);
+    const userId = Number(req.params.userId)
     // body data로부터, 확인용으로 사용할 현재 비밀번호를 추출함. (폼에서 현재비번 제출받음)
-    const currentPassword = req.body.currentPassword;
+    const password = req.body.password
 
     // currentPassword 없을 시, 진행 불가
-    if (!currentPassword) {
+    if (!password) {
       return res.status(400).send({
         error: '회원정보 삭제를 위해, 현재의 비밀번호가 필요합니다.',
-      });
+      })
     }
 
-    await userService.deleteUser(res, userId, currentPassword);
+    await userService.deleteUser(res, userId, password)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 const updateUserById = async (req, res, next) => {
   try {
@@ -115,13 +115,13 @@ const updateUserById = async (req, res, next) => {
     if (is.emptyObject(req.body)) {
       return res.status(400).send({
         error: 'headers의 Content-Type을 application/json으로 설정해주세요',
-      });
+      })
     }
 
-    const userId = Number(req.params.userId);
+    const userId = Number(req.params.userId)
     const {
       email,
-      // password,
+      password,
       name,
       nickname,
       phoneNumber,
@@ -130,7 +130,7 @@ const updateUserById = async (req, res, next) => {
       age,
       profileImg,
       // currentPassword,
-    } = req.body;
+    } = req.body
 
     // if (!currentPassword) {
     //   return res.status(400).send({
@@ -144,7 +144,7 @@ const updateUserById = async (req, res, next) => {
     // 보내주었다면, 업데이트용 객체에 삽입함.
     const toUpdate = {
       ...(email && { email }),
-      // ...(password && { password }),
+      ...(password && { password }),
       ...(name && { name }),
       ...(nickname && { nickname }),
       ...(phoneNumber && { phoneNumber }),
@@ -153,13 +153,13 @@ const updateUserById = async (req, res, next) => {
       ...(role && { role }),
       ...(age && { age }),
       ...(profileImg && { profileImg }),
-    };
+    }
 
-    await userService.setUser(userId, toUpdate, res);
+    await userService.setUser(userId, toUpdate, res)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export {
   addUser,
@@ -170,4 +170,4 @@ export {
   getUser,
   delUserById,
   updateUserById,
-};
+}
