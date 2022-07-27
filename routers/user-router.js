@@ -6,7 +6,6 @@ import passport from 'passport'
 import { userService } from '../services/index.js'
 import jwt from 'jsonwebtoken'
 import auth from '../middlewares/auth.js'
-import { loginWithKakao } from '../middlewares/loginWithKakao.js'
 
 import * as userController from '../controller/user-controller.js'
 
@@ -133,8 +132,7 @@ userRouter.post(
 //   }
 // );
 userRouter.post('/kakao', async function (req, res, next) {
-  console.log('in?')
-  loginWithKakao(req, res)
+  userController.socialLoginToken(req, res)
 })
 
 /**
