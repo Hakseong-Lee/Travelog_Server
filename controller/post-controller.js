@@ -12,15 +12,19 @@ const addPost = async (req, res, next) => {
     }
 
     const userId = req.user.id; // jwtStrategy에서 토큰을 복호화해 나온 userId로 user찾아옴
-    const { title, content, flagHideYN, markedData } = req.body;
+    const { title, content, mainImg, flagHideYN, markedData, cateCity, tag } =
+      req.body;
 
     const postInfo = {
       userId,
 
       title,
       content,
+      mainImg,
       flagHideYN,
       markedData,
+      cateCity,
+      tag,
     };
 
     const post = await postService.addPost(postInfo);
@@ -74,14 +78,18 @@ const updatePostById = async (req, res, next) => {
     }
 
     const postId = Number(req.params.postId);
-    const { title, content, flagHideYN, markedData } = req.body;
+    const { title, content, mainImg, flagHideYN, markedData, cateCity, tag } =
+      req.body;
 
     // 위 데이터가 undefined가 아니라면, 즉, 프론트에서 업데이트를 위해 보내주었다면, 업데이트용 객체에 삽입함.
     const toUpdate = {
       ...(title && { title }),
       ...(content && { content }),
+      ...(mainImg && { mainImg }),
       ...(flagHideYN && { flagHideYN }),
       ...(markedData && { markedData }),
+      ...(cateCity && { cateCity }),
+      ...(tag && { tag }),
     };
 
     // 사용자 정보를 업데이트함.
@@ -103,9 +111,19 @@ const delPost = async (req, res, next) => {
   }
 };
 
+const getPostsByCreate = async (req, res, next) => {
+  try {
+    const posts = await postService.getPostsByCreate();
+    res.status(201).json(posts);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   addPost,
   getPost,
+  getPostsByCreate,
   getPostsByUserId,
   getPosts,
   updatePostById,
