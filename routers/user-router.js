@@ -80,6 +80,32 @@ userRouter.post(
 
 /**
  * @swagger
+ *  /api/users:
+ *    post:
+ *      tags:
+ *      - user
+ *      description: 비밀번호 체크
+ *      produces:
+ *      - application/json
+ *      requestBody:
+ *        content:
+ *          application/x-www-form-urlencoded:
+ *            schema:
+ *              $ref: 'swagger/user.yaml#/components/schemas/User'
+ *      responses:
+ *       '200':
+ *          description: 유저 로그인 성공
+ */
+userRouter.post(
+  '/user/check',
+  passport.authenticate('jwt', { session: false }),
+  async function (req, res, next) {
+    userController.userPasswordCheck(req, res, next);
+  }
+);
+
+/**
+ * @swagger
  *  /api/users/kakao:
  *    get:
  *      tags:
@@ -92,20 +118,22 @@ userRouter.post(
  *          description: 유저 소셜 로그인
  */
 
-//* 카카오로 로그인하기 라우터 ***********************
-//? /kakao로 요청오면, 카카오 로그인 페이지로 가게 되고,
-//  카카오 서버를 통해 카카오 로그인을 하게 되면, 다음 라우터로 요청한다.
-userRouter.get('/kakao', passport.authenticate('kakao'));
+// userRouter.get('/kakao', passport.authenticate('kakao'));
 
-userRouter.get(
-  '/kakao/callback',
-  passport.authenticate('kakao', {
-    failureRedirect: '/',
-  }),
-  async function (req, res, next) {
-    res.redirect('/');
-  }
-);
+//? 위에서 카카오 서버 로그인이 되면, 카카오 redirect url 설정에 따라 이쪽 라우터로 오게 된다.
+// userRouter.get(
+//   '/kakao/callback',
+//   passport.authenticate('kakao', {
+//     failureRedirect: 'http://localhost:3000/login',
+//   }),
+//   (req, res) => {
+//     userController.socialLoginToken(req, res);
+//     res.redirect('http://localhost:3000/');
+//   }
+// );
+userRouter.post('/kakao', async function (req, res, next) {
+  userController.socialLoginToken(req, res);
+});
 
 /**
  * @swagger
