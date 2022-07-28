@@ -14,6 +14,38 @@ export class CommentModel {
     return createdNewComment;
   }
 
+  async findById(commentId) {
+    const comments = await prisma.Comment.findUnique({
+      where: { id: commentId },
+    });
+    return comments;
+  }
+
+  async findByPostId(postId) {
+    const comments = await prisma.Comment.findMany({
+      where: { postId: postId },
+      include: {
+        User: {
+          select: {
+            nickname: true,
+            profileImg: true,
+          },
+        },
+      },
+      orderBy: { createAt: 'asc' },
+    });
+    return comments;
+  }
+
+  async deleteOne(commentId) {
+    const count = await prisma.Comment.delete({
+      where: {
+        id: commentId,
+      },
+    });
+    return count;
+  }
+
   //   async createMany(bookmarkInfos) {
   //     const createdNewBookmark = await prisma.Bookmark.createMany({
   //       data: bookmarkInfos,
@@ -32,13 +64,6 @@ export class CommentModel {
   //     return folders;
   //   }
 
-  //   async findByUserId(userId) {
-  //     const bookmarks = await prisma.Bookmark.findMany({
-  //       where: { userId: userId },
-  //     });
-  //     return bookmarks;
-  //   }
-
   //   async findByFolder(userId, bookmarkName) {
   //     const bookmarks = await prisma.Bookmark.findMany({
   //       where: {
@@ -46,14 +71,6 @@ export class CommentModel {
   //       },
   //     });
   //     return bookmarks;
-  //   }
-
-  //   async deleteByFolder({ userId, bookmarkName }) {
-  //     await prisma.Bookmark.deleteMany({
-  //       where: {
-  //         AND: [{ userId: userId }, { bookmarkName: bookmarkName }],
-  //       },
-  //     });
   //   }
 
   //   async deleteById({ userId, bookmarkIds }) {
