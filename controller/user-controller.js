@@ -1,15 +1,10 @@
 import { userService } from '../services/index.js';
-import is from '@sindresorhus/is';
+import * as tools from '../utils/exception-tools.js';
 
 const addUser = async (req, res, next) => {
   try {
-    // Content-Type: application/json 설정을 안 한 경우, 에러를 만들도록 함.
-    // application/json 설정을 프론트에서 안 하면, body가 비어 있게 됨.
-    if (is.emptyObject(req.body)) {
-      return res.status(400).send({
-        error: 'headers의 Content-Type을 application/json으로 설정해주세요',
-      });
-    }
+    tools.isHeaderJSON(req.body);
+
     const { email, password, name, nickname, address, role, age } = req.body;
 
     const userInfo = {
@@ -32,11 +27,15 @@ const userLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const token = await userService.getUserToken(res, email, password);
+    const { token, userId } = await userService.getUserToken(
+      res,
+      email,
+      password
+    );
 
     // 로그인 진행 성공시 userId(문자열) 와 jwt 토큰(문자열)을 프론트에 보냄
     // res.status(200).json({ userId, token });
-    res.status(200).json({ token });
+    res.status(200).json({ token, userId });
   } catch (error) {
     console.log(error);
   }
@@ -60,8 +59,8 @@ const userPasswordCheck = async (req, res, next) => {
 const socialLoginToken = async (req, res) => {
   try {
     const userEmail = String(req.body.data.data.id);
-    const token = await userService.getUserTokenByEmail(userEmail);
-    res.status(200).json({ token });
+    const { token, userId } = await userService.getUserTokenByEmail(userEmail);
+    res.status(200).json({ token, userId });
   } catch (error) {
     console.log(error);
   }
@@ -111,13 +110,7 @@ const delUserById = async (req, res, next) => {
 
 const updateUserById = async (req, res, next) => {
   try {
-    // content-type 을 application/json 로 프론트에서
-    // 설정 안 하고 요청하면, body가 비어 있게 됨.
-    if (is.emptyObject(req.body)) {
-      return res.status(400).send({
-        error: 'headers의 Content-Type을 application/json으로 설정해주세요',
-      });
-    }
+    tools.isHeaderJSON(req.body);
 
     const userId = Number(req.params.userId);
     const {
