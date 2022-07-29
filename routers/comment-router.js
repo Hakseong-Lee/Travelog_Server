@@ -11,6 +11,7 @@ commentRouter.get(
   '/',
   passport.authenticate('jwt', { session: false }),
   async (req, res, next) => {
+      console.log('fdsjafa');
     commentController.getComments(req, res, next);
   }
 );

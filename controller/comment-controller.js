@@ -28,6 +28,7 @@ const getCommentsByPostId = async (req, res, next) => {
 
     const comments = await commentService.getCommentsByPostId(postId);
     res.status(201).json(comments);
+    
   } catch (error) {
     console.log(error);
   }
